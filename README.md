@@ -1,3 +1,9 @@
+# Next.js realtime comments
+
+Code for how to implement a comment system with Firebase Realtime Database.
+
+You can read it through on my blog [alckor.dev/nextjs-realtime-comments](https://alckor.dev/nextjs-realtime-comments).
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
