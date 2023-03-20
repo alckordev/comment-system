@@ -1,12 +1,16 @@
+import * as Chakra from "@chakra-ui/react";
 import { getThread } from "@/lib/firebase-utils";
+import { DiscussionThread } from "@/components/DiscussionThread";
 
 export default function Post({ post, thread }: any) {
   console.log(thread);
   return (
-    <main>
-      <h1>{post.title}</h1>
-      <p>{post.body}</p>
-    </main>
+    <Chakra.Container>
+      <Chakra.Heading my={8}>{post.title}</Chakra.Heading>
+      <Chakra.Box>{post.body}</Chakra.Box>
+      <Chakra.Divider borderColor="gray.500" my={8} />
+      <DiscussionThread identifier={thread.key} />
+    </Chakra.Container>
   );
 }
 
@@ -33,7 +37,7 @@ export async function getStaticProps({ params }: any) {
   );
   const post = await res.json();
 
-  // get thread
+  // Get thread
   const thread = await getThread(params.id);
 
   return {

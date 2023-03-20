@@ -41,3 +41,21 @@ export async function getThread(identifier: string) {
 
   return setThread(identifier);
 }
+
+export async function getCommentsByThread(identifier: string) {
+  const commentRef = fbdb.ref(database, "comments");
+
+  const endpoint = fbdb.query(
+    commentRef,
+    fbdb.orderByChild("thread"),
+    fbdb.equalTo(identifier)
+  );
+
+  const snapshot = await fbdb.get(endpoint);
+
+  if (snapshot.exists()) {
+    return getWithKey(snapshot.val());
+  }
+
+  return undefined;
+}
