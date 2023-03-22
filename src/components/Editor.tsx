@@ -12,7 +12,13 @@ export const Editor = ({
   thread,
   parent = null,
   placeholder = "Únete a la conversación...",
-}: any) => {
+  onCancel,
+}: {
+  thread: string;
+  parent: string | null;
+  placeholder?: string;
+  onCancel?: () => void;
+}) => {
   const user = useContext(AuthContext);
 
   const {
@@ -53,6 +59,8 @@ export const Editor = ({
       });
 
       reset({ message: "" });
+
+      if (onCancel && typeof onCancel === "function") onCancel();
     } catch (err) {
       toast({
         description: "¡Oops! Something went wrong.",
@@ -71,13 +79,18 @@ export const Editor = ({
           {...register("message")}
         />
       </Chakra.FormControl>
-      <Chakra.Button
-        type="submit"
-        isLoading={isSubmitting}
-        isDisabled={!isValid}
-      >
-        Comentar
-      </Chakra.Button>
+      <Chakra.HStack>
+        {onCancel && typeof onCancel === "function" && (
+          <Chakra.Button onClick={onCancel}>Cancelar</Chakra.Button>
+        )}
+        <Chakra.Button
+          type="submit"
+          isLoading={isSubmitting}
+          isDisabled={!isValid}
+        >
+          Comentar
+        </Chakra.Button>
+      </Chakra.HStack>
     </Chakra.VStack>
   );
 };
