@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import * as Chakra from "@chakra-ui/react";
-import { getCommentsByThread } from "@/lib/firebase-utils";
+import {
+  getCommentsByThread,
+  orderByDate,
+  sortTreeNodes,
+} from "@/lib/firebase-utils";
 import * as fbdb from "firebase/database";
 import { database } from "@/lib/firebase";
 import { Editor } from "./Editor";
@@ -16,7 +20,7 @@ export const DiscussionThread = ({ identifier }: { identifier: string }) => {
 
       if (!data) return;
 
-      setComments(data.reverse());
+      setComments(data.sort(orderByDate));
     }
 
     loadComments();
@@ -50,7 +54,7 @@ export const DiscussionThread = ({ identifier }: { identifier: string }) => {
       <Editor thread={identifier} />
       <Chakra.Divider borderColor="gray.500" my={8} />
       <Chakra.VStack divider={<Chakra.StackDivider />} spacing={6}>
-        {comments.map((comment) => (
+        {sortTreeNodes(comments).map((comment) => (
           <Comment key={comment.key} thread={identifier} comment={comment} />
         ))}
       </Chakra.VStack>
