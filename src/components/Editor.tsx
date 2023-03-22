@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import * as Chakra from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -5,21 +6,23 @@ import * as yup from "yup";
 import { formatISO } from "date-fns";
 import * as fbdb from "firebase/database";
 import { database } from "@/lib/firebase";
+import { AuthContext } from "@/store/AuthProvider";
 
 export const Editor = ({
   thread,
+  parent = null,
   placeholder = "Únete a la conversación...",
 }: any) => {
+  const user = useContext(AuthContext);
+
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
   } = useForm({
     resolver: yupResolver(
       yup.object().shape({
-        author_name: yup.string().required(),
-        author_email: yup.string().email().required(),
         message: yup.string().min(2).required(),
       })
     ),
@@ -28,16 +31,24 @@ export const Editor = ({
   const toast = Chakra.useToast();
 
   const onSubmit = handleSubmit(async (values) => {
+    if (!user) {
+      // Add logic for the case of no user session
+      return;
+    }
+
     try {
       const commentRef = fbdb.push(fbdb.ref(database, "comments"));
 
       await fbdb.set(commentRef, {
         thread,
         author: {
-          name: values.author_name,
-          email: values.author_email,
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          picture: user.photoURL,
         },
         message: values.message,
+        parent: parent,
         createdAt: formatISO(new Date()),
       });
 
@@ -52,20 +63,6 @@ export const Editor = ({
 
   return (
     <Chakra.VStack minW="100%" as="form" onSubmit={onSubmit}>
-      <Chakra.FormControl isInvalid={errors.author_name ? true : false}>
-        <Chakra.Input
-          placeholder="Name"
-          size="sm"
-          {...register("author_name")}
-        />
-      </Chakra.FormControl>
-      <Chakra.FormControl isInvalid={errors.author_email ? true : false}>
-        <Chakra.Input
-          placeholder="E-mail"
-          size="sm"
-          {...register("author_email")}
-        />
-      </Chakra.FormControl>
       <Chakra.FormControl isInvalid={errors.message ? true : false}>
         <Chakra.Textarea
           placeholder={placeholder}
@@ -74,7 +71,11 @@ export const Editor = ({
           {...register("message")}
         />
       </Chakra.FormControl>
-      <Chakra.Button type="submit" isLoading={isSubmitting}>
+      <Chakra.Button
+        type="submit"
+        isLoading={isSubmitting}
+        isDisabled={!isValid}
+      >
         Comentar
       </Chakra.Button>
     </Chakra.VStack>

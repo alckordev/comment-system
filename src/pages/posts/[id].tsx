@@ -1,11 +1,27 @@
+import { useContext } from "react";
 import * as Chakra from "@chakra-ui/react";
 import { getThread } from "@/lib/firebase-utils";
 import { DiscussionThread } from "@/components/DiscussionThread";
+import { SignInWithGoogleButton } from "@/components/SignInWithGoogle";
+import { SignOut } from "@/components/SignOut";
+import { AuthContext } from "@/store/AuthProvider";
 
 export default function Post({ post, thread }: any) {
-  console.log(thread);
+  const user = useContext(AuthContext);
+
   return (
-    <Chakra.Container>
+    <Chakra.Container py={16}>
+      <Chakra.Flex gap={4} align="center" justify="space-between">
+        <Chakra.Heading size="md">
+          Welcome {user && user.displayName}
+        </Chakra.Heading>
+        <Chakra.Box>
+          {user ? <SignOut /> : <SignInWithGoogleButton />}
+        </Chakra.Box>
+      </Chakra.Flex>
+
+      <Chakra.Divider borderColor="gray.500" my={8} />
+
       <Chakra.Heading my={8}>{post.title}</Chakra.Heading>
       <Chakra.Box>{post.body}</Chakra.Box>
       <Chakra.Divider borderColor="gray.500" my={8} />
